@@ -17,7 +17,7 @@ FROOTS = {"loc_geoposition": "locations/v{version:d}/cities/geoposition/search.j
           "loc_search": "locations/v{version:d}/search.json",
           "loc_search_country": "locations/v{version:d}/{country_code}/search.json",
           "loc_postcode": "locations/v{version:d}/postalcodes/{country_code:s}/search.json",
-          "loc_lkey": "locations/v{version:d}/{location_key:d}.json",
+          "loc_lkey": "locations/v{version:d}/{location_key}.json",
           "currentconditions": "currentconditions/v{version:d}/{location_key}.json",
           "currentconditions_6": "currentconditions/v{version:d}/{location_key}/historical.json",
           "currentconditions_24": "currentconditions/v{version:d}/{location_key}/historical/24.json",
@@ -49,7 +49,6 @@ FROOTS = {"loc_geoposition": "locations/v{version:d}/cities/geoposition/search.j
           "alarms_15d": "alarms/v{version:d}/15day/{location_key}",
           "alarms_25d": "alarms/v{version:d}/25day/{location_key}"
           }
-
 
 def froot(arg, **kwargs):
     """

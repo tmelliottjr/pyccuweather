@@ -141,7 +141,7 @@ class Location(object):
                  country: Country=None,
                  administrative_area: AdministrativeArea=None,
                  timezone: TimeZone=None):
-
+        
         if json:
             lkey = json["Key"]
             lat = json["GeoPosition"]["Latitude"]
