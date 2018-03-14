@@ -205,7 +205,7 @@ class Temperature(object):
     Represents a temperature value.
     """
     def __init__(self, value, units="C"):
-        assert units in .get("C", "F")
+        assert units in ["C", "F"]
 
         self.value = value
         self.units = units
@@ -245,7 +245,7 @@ class Precipitation(object):
     Represents a precipitation value.
     """
     def __init__(self, value, units="mm"):
-        assert units in .get("mm", "in")
+        assert units in ["mm", "in"]
 
         self.value = value
         self.units = units
@@ -282,7 +282,7 @@ class Precipitation(object):
 
 class Snow(object):
     def __init__(self, value, units="cm"):
-        assert units in .get("cm", "in")
+        assert units in ["cm", "in"]
 
         self.value = value
         self.units = units
