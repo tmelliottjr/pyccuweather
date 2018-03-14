@@ -25,9 +25,9 @@ class Region(object):
         assert json or (localized_name and english_name and identifier)
 
         if json:
-            identifier = json["ID"]
-            localized_name = json["LocalizedName"]
-            english_name = json["EnglishName"]
+            identifier = json.get("ID")
+            localized_name = json.get("LocalizedName")
+            english_name = json.get("EnglishName")
 
         self.id = identifier
         self.localized_name = localized_name
@@ -53,12 +53,12 @@ class AdministrativeArea(object):
         assert json or (identifier and localized_name and english_name and level and localized_type and english_type)
 
         if json:
-            identifier = json["ID"]
-            localized_name = json["LocalizedName"]
-            english_name = json["EnglishName"]
-            level = json["Level"]
-            localized_type = json["LocalizedType"]
-            english_type = json["EnglishType"]
+            identifier = json.get("ID")
+            localized_name = json.get("LocalizedName")
+            english_name = json.get("EnglishName")
+            level = json.get("Level")
+            localized_type = json.get("LocalizedType")
+            english_type = json.get("EnglishType")
 
         self.id = identifier
         self.localized_name = localized_name
@@ -80,9 +80,9 @@ class Country(object):
         assert json or (localized_name and english_name and identifier)
 
         if json:
-            identifier = json["ID"]
-            localized_name = json["LocalizedName"]
-            english_name = json["EnglishName"]
+            identifier = json.get("ID")
+            localized_name = json.get("LocalizedName")
+            english_name = json.get("EnglishName")
 
         self.id = identifier
         self.localized_name = localized_name
@@ -112,11 +112,11 @@ class TimeZone(object):
             assert isinstance(next_offset_change, str) and len(next_offset_change) == 20
 
         if json:
-            code = json["Code"]
-            name = json["Name"]
-            gmt_offset = json["GmtOffset"]
-            is_daylight_saving = True if json["IsDaylightSaving"] is 'true' else False
-            next_offset_change = json["NextOffsetChange"]
+            code = json.get("Code")
+            name = json.get("Name")
+            gmt_offset = json.get("GmtOffset")
+            is_daylight_saving = True if json.get("IsDaylightSaving") is 'true' else False
+            next_offset_change = json.get("NextOffsetChange")
 
         self.code = code
         self.name = name
@@ -143,15 +143,15 @@ class Location(object):
                  timezone: TimeZone=None):
         
         if json:
-            lkey = json["Key"]
-            lat = json["GeoPosition"]["Latitude"]
-            lon = json["GeoPosition"]["Longitude"]
-            localized_name = json["LocalizedName"]
-            english_name = json["EnglishName"]
-            region = json["Region"]
-            country = json["Country"]
-            administrative_area = json["AdministrativeArea"]
-            timezone = json["TimeZone"]
+            lkey = json.get("Key")
+            lat = json.get("GeoPosition").get("Latitude")
+            lon = json.get("GeoPosition").get("Longitude")
+            localized_name = json.get("LocalizedName")
+            english_name = json.get("EnglishName")
+            region = json.get("Region")
+            country = json.get("Country")
+            administrative_area = json.get("AdministrativeArea")
+            timezone = json.get("TimeZone")
 
         self.lkey = lkey
         self.lat = lat
@@ -205,7 +205,7 @@ class Temperature(object):
     Represents a temperature value.
     """
     def __init__(self, value, units="C"):
-        assert units in ["C", "F"]
+        assert units in .get("C", "F")
 
         self.value = value
         self.units = units
@@ -245,7 +245,7 @@ class Precipitation(object):
     Represents a precipitation value.
     """
     def __init__(self, value, units="mm"):
-        assert units in ["mm", "in"]
+        assert units in .get("mm", "in")
 
         self.value = value
         self.units = units
@@ -282,7 +282,7 @@ class Precipitation(object):
 
 class Snow(object):
     def __init__(self, value, units="cm"):
-        assert units in ["cm", "in"]
+        assert units in .get("cm", "in")
 
         self.value = value
         self.units = units
@@ -309,12 +309,12 @@ class Snow(object):
 class Wind(object):
     def __init__(self, json, hdg=None):
 
-        self.speed = json["Speed"]["Value"]
-        self.units = json["Speed"]["Unit"]
+        self.speed = json.get("Speed").get("Value")
+        self.units = json.get("Speed").get("Unit")
         if hdg is not None:
             self.hdg = hdg
         else:
-            self.hdg = json["Direction"]["Degrees"]
+            self.hdg = json.get("Direction").get("Degrees")
 
     def kmh(self):
         if self.units == "km/h":
@@ -336,10 +336,10 @@ class Wind(object):
 
 class AirQualityFactor(object):
     def __init__(self, aqf_dict):
-        self.name = aqf_dict["Name"]
-        self.value = aqf_dict["Value"]
-        self.category = aqf_dict["Category"]
-        self.band = aqf_dict["CategoryValue"]
+        self.name = aqf_dict.get("Name")
+        self.value = aqf_dict.get("Value")
+        self.category = aqf_dict.get("Category")
+        self.band = aqf_dict.get("CategoryValue")
 
 
     def __str__(self):
@@ -352,13 +352,13 @@ class AirQuality(object):
     def __init__(self, aqf_dict):
         for each in aqf_dict:
             aqi = AirQualityFactor(each)
-            exec("self.%s = aqi" % each["Name"].lower())
+            exec("self.%s = aqi" % each.get("Name").lower())
 
 
 class Ceiling(object):
     def __init__(self, json):
-        self.value = json["Value"]
-        self.units = json["Unit"]
+        self.value = json.get("Value")
+        self.units = json.get("Unit")
 
     @property
     def km(self):
@@ -390,31 +390,31 @@ class Hemiurnal(object):
     def __init__(self, json):
         self.id = uuid4()
         # Verbals
-        self.synopsis = json["LongPhrase"]
-        self.phrase = json["ShortPhrase"]
+        self.synopsis = json.get("LongPhrase")
+        self.phrase = json.get("ShortPhrase")
         # Precipitation
-        self.snow = Snow(value=json["Snow"]["Value"],
-                         units=json["Snow"]["Unit"])
-        self.wind = Wind(json["Wind"])
-        self.rain = Precipitation(value=json["Rain"]["Value"],
-                                  units=json["Rain"]["Unit"])
-        self.ice = Precipitation(value=json["Ice"]["Value"],
-                                 units=json["Ice"]["Unit"])
-        self.total_liquid = Precipitation(value=json["Ice"]["Value"],
-                                          units=json["Ice"]["Unit"])
-        self.h_precipitation = json["HoursOfPrecipitation"]
-        self.h_rain = json["HoursOfRain"]
+        self.snow = Snow(value=json.get("Snow").get("Value"),
+                         units=json.get("Snow").get("Unit"))
+        self.wind = Wind(json.get("Wind"))
+        self.rain = Precipitation(value=json.get("Rain").get("Value"),
+                                  units=json.get("Rain").get("Unit"))
+        self.ice = Precipitation(value=json.get("Ice").get("Value"),
+                                 units=json.get("Ice").get("Unit"))
+        self.total_liquid = Precipitation(value=json.get("Ice").get("Value"),
+                                          units=json.get("Ice").get("Unit"))
+        self.h_precipitation = json.get("HoursOfPrecipitation")
+        self.h_rain = json.get("HoursOfRain")
         # Cloud cover
-        self.cloud_cover = json["CloudCover"]
+        self.cloud_cover = json.get("CloudCover")
         # Probabilities
-        self.p_rain = json["RainProbability"]
-        self.p_snow = json["SnowProbability"]
-        self.p_ice = json["IceProbability"]
-        self.p_thunderstorm = json["ThunderstormProbability"]
-        self.p_precipitation = json["PrecipitationProbability"]
+        self.p_rain = json.get("RainProbability")
+        self.p_snow = json.get("SnowProbability")
+        self.p_ice = json.get("IceProbability")
+        self.p_thunderstorm = json.get("ThunderstormProbability")
+        self.p_precipitation = json.get("PrecipitationProbability")
         # Wind
         if "WindGust" in json.keys():
-            self.wind_gust = Wind(json["WindGust"])
+            self.wind_gust = Wind(json.get("WindGust"))
         else:
             self.wind_gust = None
         self.raw = json
@@ -424,33 +424,33 @@ class Hemiurnal(object):
 
 class DegreeDay(object):
     def __init__(self, aqf_dict):
-        self.cooling = Temperature(value=aqf_dict["Cooling"]["Value"], units=aqf_dict["Cooling"]["Unit"])
-        self.warming = Temperature(value=aqf_dict["Warming"]["Value"], units=aqf_dict["Warming"]["Unit"])
+        self.cooling = Temperature(value=aqf_dict.get("Cooling").get("Value"), units=aqf_dict.get("Cooling").get("Unit"))
+        self.warming = Temperature(value=aqf_dict.get("Warming").get("Value"), units=aqf_dict.get("Warming").get("Unit"))
 
 
 class DailyForecast(object):
     def __init__(self, json):
         # Dates
-        self.epoch_date = json["EpochDate"]
-        self.date = json["Date"]
+        self.epoch_date = json.get("EpochDate")
+        self.date = json.get("Date")
         # Temperatures
-        self.temp_min = Temperature(value=json["Temperature"]["Minimum"]["Value"],
-                                    units=json["Temperature"]["Minimum"]["Unit"])
-        self.temp_max = Temperature(value=json["Temperature"]["Maximum"]["Value"],
-                                    units=json["Temperature"]["Maximum"]["Unit"])
-        self.realfeel_temp_min = Temperature(value=json["RealFeelTemperature"]["Minimum"]["Value"],
-                                             units=json["RealFeelTemperature"]["Minimum"]["Unit"])
-        self.realfeel_temp_max = Temperature(value=json["RealFeelTemperature"]["Maximum"]["Value"],
-                                             units=json["RealFeelTemperature"]["Maximum"]["Unit"])
-        self.realfeel_shade_temp_min = Temperature(value=json["RealFeelTemperatureShade"]["Minimum"]["Value"],
-                                                   units=json["RealFeelTemperatureShade"]["Minimum"]["Unit"])
-        self.realfeel_shade_temp_max = Temperature(value=json["RealFeelTemperatureShade"]["Maximum"]["Value"],
-                                                   units=json["RealFeelTemperatureShade"]["Maximum"]["Unit"])
+        self.temp_min = Temperature(value=json.get("Temperature").get("Minimum").get("Value"),
+                                    units=json.get("Temperature").get("Minimum").get("Unit"))
+        self.temp_max = Temperature(value=json.get("Temperature").get("Maximum").get("Value"),
+                                    units=json.get("Temperature").get("Maximum").get("Unit"))
+        self.realfeel_temp_min = Temperature(value=json.get("RealFeelTemperature").get("Minimum").get("Value"),
+                                             units=json.get("RealFeelTemperature").get("Minimum").get("Unit"))
+        self.realfeel_temp_max = Temperature(value=json.get("RealFeelTemperature").get("Maximum").get("Value"),
+                                             units=json.get("RealFeelTemperature").get("Maximum").get("Unit"))
+        self.realfeel_shade_temp_min = Temperature(value=json.get("RealFeelTemperatureShade").get("Minimum").get("Value"),
+                                                   units=json.get("RealFeelTemperatureShade").get("Minimum").get("Unit"))
+        self.realfeel_shade_temp_max = Temperature(value=json.get("RealFeelTemperatureShade").get("Maximum").get("Value"),
+                                                   units=json.get("RealFeelTemperatureShade").get("Maximum").get("Unit"))
         # Sunshine hours
-        self.hours_of_sun = json["HoursOfSun"]
+        self.hours_of_sun = json.get("HoursOfSun")
         # Hemiurnals
-        self.day = Hemiurnal(json["Day"])
-        self.night = Hemiurnal(json["Night"])
+        self.day = Hemiurnal(json.get("Day"))
+        self.night = Hemiurnal(json.get("Night"))
         self.raw = json
 
     def __str__(self):
@@ -462,52 +462,52 @@ class HourlyForecast(object):
     def __init__(self, json):
 
         # Dates and times
-        self.epoch_datetime = json["EpochDateTime"]
-        self.datetime = json["DateTime"]
+        self.epoch_datetime = json.get("EpochDateTime")
+        self.datetime = json.get("DateTime")
         # Temperatures
-        self.temperature = Temperature(value=json["Temperature"]["Value"],
-                                       units=json["Temperature"]["Unit"])
-        self.realfeel_temperature = Temperature(value=json["Temperature"]["Value"],
-                                                units=json["Temperature"]["Unit"])
+        self.temperature = Temperature(value=json.get("Temperature").get("Value"),
+                                       units=json.get("Temperature").get("Unit"))
+        self.realfeel_temperature = Temperature(value=json.get("Temperature").get("Value"),
+                                                units=json.get("Temperature").get("Unit"))
         # Cloud cover and ceiling
-        self.cloud_cover = json["CloudCover"]
-        self.ceiling = Ceiling(json["Ceiling"])
+        self.cloud_cover = json.get("CloudCover")
+        self.ceiling = Ceiling(json.get("Ceiling"))
         # Wind
-        self.wind = Wind(json["Wind"])
+        self.wind = Wind(json.get("Wind"))
 
         if "WindGust" in json.keys():
-            if "Direction" in json["WindGust"].keys():
-                self.wind_gust = Wind(json["WindGust"])
+            if "Direction" in json.get("WindGust").keys():
+                self.wind_gust = Wind(json.get("WindGust"))
             else:
-                self.wind_gust = Wind(json["WindGust"], hdg=self.wind.hdg)
+                self.wind_gust = Wind(json.get("WindGust"), hdg=self.wind.hdg)
         else:
             self.wind_gust = None
         # rH% and dew point
-        self.rh = json["RelativeHumidity"]
-        self.dewpoint = Temperature(value=json["DewPoint"]["Value"],
-                                    units=json["DewPoint"]["Unit"])
-        self.wet_bulb_temperature = Temperature(value=json["WetBulbTemperature"]["Value"],
-                                                units=json["WetBulbTemperature"]["Unit"])
+        self.rh = json.get("RelativeHumidity")
+        self.dewpoint = Temperature(value=json.get("DewPoint").get("Value"),
+                                    units=json.get("DewPoint").get("Unit"))
+        self.wet_bulb_temperature = Temperature(value=json.get("WetBulbTemperature").get("Value"),
+                                                units=json.get("WetBulbTemperature").get("Unit"))
         # UV index
-        self.uv_index = json["UVIndex"]
-        self.uv_index_text = json["UVIndexText"]
+        self.uv_index = json.get("UVIndex")
+        self.uv_index_text = json.get("UVIndexText")
         # Precipitation
-        self.rain = Precipitation(value=json["Rain"]["Value"],
-                                  units=json["Rain"]["Unit"])
-        self.total_liquid = Precipitation(value=json["TotalLiquid"]["Value"],
-                                          units=json["TotalLiquid"]["Unit"])
-        self.ice = Precipitation(value=json["Ice"]["Value"],
-                                 units=json["Ice"]["Unit"])
-        self.snow = Snow(value=json["Snow"]["Value"],
-                         units=json["Snow"]["Unit"])
+        self.rain = Precipitation(value=json.get("Rain").get("Value"),
+                                  units=json.get("Rain").get("Unit"))
+        self.total_liquid = Precipitation(value=json.get("TotalLiquid").get("Value"),
+                                          units=json.get("TotalLiquid").get("Unit"))
+        self.ice = Precipitation(value=json.get("Ice").get("Value"),
+                                 units=json.get("Ice").get("Unit"))
+        self.snow = Snow(value=json.get("Snow").get("Value"),
+                         units=json.get("Snow").get("Unit"))
         # Probabilities
-        self.p_snow = json["SnowProbability"]
-        self.p_ice = json["IceProbability"]
-        self.p_rain = json["RainProbability"]
-        self.p_precipitation = json["PrecipitationProbability"]
+        self.p_snow = json.get("SnowProbability")
+        self.p_ice = json.get("IceProbability")
+        self.p_rain = json.get("RainProbability")
+        self.p_precipitation = json.get("PrecipitationProbability")
         # Accuweather
-        self.link = json["Link"]
-        self.mobile_link = json["MobileLink"]
+        self.link = json.get("Link")
+        self.mobile_link = json.get("MobileLink")
         self.raw = json
 
     def __str__(self):
@@ -519,18 +519,18 @@ class HourlyForecast(object):
 
 class DailyForecasts(object):
     def __init__(self, json):
-        self.effective_date = json["Headline"]["EffectiveDate"]
-        self.effective_epoch_date = json["Headline"]["EffectiveEpochDate"]
-        self.end_date = json["Headline"]["EndDate"]
-        self.end_epoch_date = json["Headline"]["EndEpochDate"]
-        self.severity = json["Headline"]["Severity"]
-        self.synopsis = json["Headline"]["Text"]
-        self.link = json["Headline"]["Link"]
-        self.mobile_link = json["Headline"]["MobileLink"]
+        self.effective_date = json.get("Headline").get("EffectiveDate")
+        self.effective_epoch_date = json.get("Headline").get("EffectiveEpochDate")
+        self.end_date = json.get("Headline").get("EndDate")
+        self.end_epoch_date = json.get("Headline").get("EndEpochDate")
+        self.severity = json.get("Headline").get("Severity")
+        self.synopsis = json.get("Headline").get("Text")
+        self.link = json.get("Headline").get("Link")
+        self.mobile_link = json.get("Headline").get("MobileLink")
 
         self.forecasts = OrderedDict()
-        for each in json["DailyForecasts"]:
-            k = each["Date"][0:10]
+        for each in json.get("DailyForecasts"):
+            k = each.get("Date")[0:10]
             v = DailyForecast(each)
             self.forecasts[k] = v
         self.raw = json
@@ -544,7 +544,7 @@ class HourlyForecasts(object):
     def __init__(self, json):
         self.forecasts = OrderedDict()
         for each in json:
-            k = each["DateTime"]
+            k = each.get("DateTime")
             v = HourlyForecast(each)
             self.forecasts[k] = v
         self.raw = json
@@ -558,13 +558,13 @@ class HourlyForecasts(object):
 class Observation(object):
     def __init__(self, json):
         # Date and time
-        self.date_time = json["LocalObservationDateTime"]
-        self.epoch_time = json["EpochTime"]
-        self.synopsis = json["WeatherText"]
-        self.temperature = Temperature(value=json["Temperature"]["Metric"]["Value"],
-                                       units=json["Temperature"]["Metric"]["Unit"])
-        self.link = json["Link"]
-        self.mobile_link = json["MobileLink"]
+        self.date_time = json.get("LocalObservationDateTime")
+        self.epoch_time = json.get("EpochTime")
+        self.synopsis = json.get("WeatherText")
+        self.temperature = Temperature(value=json.get("Temperature").get("Metric").get("Value"),
+                                       units=json.get("Temperature").get("Metric").get("Unit"))
+        self.link = json.get("Link")
+        self.mobile_link = json.get("MobileLink")
         self.raw = json
 
     def __str__(self):
@@ -578,7 +578,7 @@ class CurrentObs(object):
     def __init__(self, json):
         self.observations = OrderedDict()
         for each in json:
-            k = each["LocalObservationDateTime"]
+            k = each.get("LocalObservationDateTime")
             v = each
             self.observations[k] = v
         self.raw = json
